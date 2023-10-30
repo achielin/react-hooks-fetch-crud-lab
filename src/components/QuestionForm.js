@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-
+import { endPoint } from "./App";
 function QuestionForm(props) {
   const [formData, setFormData] = useState({
-    prompt: "",
+    prompt:  "",
     answer1: "",
     answer2: "",
     answer3: "",
@@ -10,18 +10,41 @@ function QuestionForm(props) {
     correctIndex: 0,
   });
 
+
   function handleChange(event) {
     setFormData({
       ...formData,
       [event.target.name]: event.target.value,
     });
   }
-
+  
   function handleSubmit(event) {
     event.preventDefault();
     console.log(formData);
+    const newQuestion = {
+      prompt  : formData.prompt,
+      answers : [formData.answer1, formData.answer2, formData.answer3, formData.answer4],
+      correctIndex: formData.correctIndex 
+    }
+    fetch(endPoint, {method : "POST",
+                     headers: {
+                      "Content-Type" : "application/json",
+                      "Accept" : "application/json"
+                     },
+                     body: JSON.stringify(newQuestion)})
+    .then((response) => response.json())
+    .then(() => {props.onAddQuestion(newQuestion);
+      //Do the clean up i.e. clear the form.
+       setFormData({
+         prompt:  "",
+         answer1: "",
+         answer2: "",
+         answer3: "",
+         answer4: "",
+         correctIndex: 0,
+       })}
+    )
   }
-
   return (
     <section>
       <h1>New Question</h1>
@@ -89,5 +112,4 @@ function QuestionForm(props) {
     </section>
   );
 }
-
 export default QuestionForm;
